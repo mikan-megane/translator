@@ -26,12 +26,41 @@ pub struct MyApp {
     lang_list_with_auto: Vec<deepl::Lang>,
     lang_list: Vec<deepl::Lang>,
     task_chan: mpsc::SyncSender<()>,
-    show_box: bool,
 
     #[cfg(target_os = "windows")]
     hk_setting: HotkeySetting,
     #[cfg(target_os = "windows")]
     hotkey_rx: Receiver<()>,
+}
+
+pub fn description(lang: deepl::Lang) -> &'static str {
+    match lang {
+        deepl::Lang::Auto => "自動検出",
+        deepl::Lang::DE => "ドイツ語",
+        deepl::Lang::EN => "英語",
+        deepl::Lang::ES => "スペイン語",
+        deepl::Lang::FR => "フランス語",
+        deepl::Lang::IT => "イタリア語",
+        deepl::Lang::JA => "日本語",
+        deepl::Lang::NL => "オランダ語",
+        deepl::Lang::PL => "ポーランド語",
+        deepl::Lang::PT => "ポルトガル語",
+        deepl::Lang::RU => "ロシア語",
+        deepl::Lang::ZH => "中国語",
+        deepl::Lang::BG => "ブルガリア語",
+        deepl::Lang::CS => "チェコ語",
+        deepl::Lang::DA => "デンマーク語",
+        deepl::Lang::EL => "ギリシャ語",
+        deepl::Lang::ET => "エストニア語",
+        deepl::Lang::FI => "フィンランド語",
+        deepl::Lang::HU => "ハンガリー語",
+        deepl::Lang::LT => "リトアニア語",
+        deepl::Lang::LV => "ラトビア語",
+        deepl::Lang::RO => "ルーマニア語",
+        deepl::Lang::SK => "スロバキア語",
+        deepl::Lang::SL => "スロベニア語",
+        deepl::Lang::SV => "スウェーデン語",
+    }
 }
 
 impl MyApp {
@@ -61,7 +90,6 @@ impl MyApp {
             lang_list_with_auto: deepl::Lang::lang_list_with_auto(),
             lang_list: deepl::Lang::lang_list(),
             task_chan,
-            show_box: false,
 
             #[cfg(target_os = "windows")]
             hk_setting,
@@ -79,13 +107,13 @@ impl eframe::App for MyApp {
             lang_list_with_auto,
             lang_list,
             task_chan,
-            show_box,
 
             #[cfg(target_os = "windows")]
             hk_setting,
             #[cfg(target_os = "windows")]
             hotkey_rx,
         } = self;
+        frame.set_decorations(true);
         let mut state = state.lock().unwrap();
 
         let old_source_lang = state.source_lang;
@@ -107,12 +135,12 @@ impl eframe::App for MyApp {
                 ui.horizontal_top(|ui| {
                     let combobox_width = 145.0;
                     egui::ComboBox::from_id_source(egui::Id::new("source_lang_ComboBox"))
-                        .selected_text(state.source_lang.description())
+                        .selected_text(description(state.source_lang))
                         .width(combobox_width)
                         .show_ui(ui, |ui| {
                             for i in lang_list_with_auto {
                                 let i = i.to_owned();
-                                ui.selectable_value(&mut state.source_lang, i, i.description());
+                                ui.selectable_value(&mut state.source_lang, i, description(i));
                             }
                         });
 
@@ -128,38 +156,17 @@ impl eframe::App for MyApp {
                     };
 
                     egui::ComboBox::from_id_source(egui::Id::new("target_lang_ComboBox"))
-                        .selected_text(state.target_lang.description())
+                        .selected_text(description(state.target_lang))
                         .width(combobox_width)
                         .show_ui(ui, |ui| {
                             for i in lang_list {
                                 let i = i.to_owned();
-                                ui.selectable_value(&mut state.target_lang, i, i.description());
+                                ui.selectable_value(&mut state.target_lang, i, description(i));
                             }
                         });
-                    if ui.add(egui::Button::new("翻译")).clicked() {
+                    if ui.add(egui::Button::new("翻訳")).clicked() {
                         _ = task_chan.send(());
                     };
-
-                    ui.horizontal_wrapped(|ui| {
-                        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                            ui.visuals_mut().hyperlink_color = state.link_color;
-                            ui.hyperlink_to(
-                                egui::special_emojis::GITHUB.to_string(),
-                                "https://github.com/zu1k/translator",
-                            );
-
-                            if ui.add(egui::Button::new("□").frame(false)).clicked() {
-                                *show_box = !*show_box;
-                                frame.set_decorations(*show_box);
-                            };
-                            if ui
-                                .add(egui::Button::new("○").frame(false))
-                                .is_pointer_button_down_on()
-                            {
-                                frame.drag_window();
-                            };
-                        });
-                    });
                 });
 
                 ui.separator();

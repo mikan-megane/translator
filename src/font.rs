@@ -7,19 +7,19 @@ use crate::cfg::SETTINGS;
 pub fn install_fonts(egui_ctx: &egui::Context) {
     let mut fonts = FontDefinitions::default();
     fonts.font_data.insert(
-        "LXGWWenKai-Regular".to_owned(),
-        FontData::from_static(include_bytes!("../res/LXGWWenKai-Regular.ttf")),
+        "MOBO-Regular".to_owned(),
+        FontData::from_static(include_bytes!("../res/MOBO-Regular.otf")),
     );
     fonts
         .families
         .get_mut(&FontFamily::Monospace)
         .unwrap()
-        .insert(0, "LXGWWenKai-Regular".to_owned());
+        .insert(0, "MOBO-Regular".to_owned());
     fonts
         .families
         .get_mut(&FontFamily::Proportional)
         .unwrap()
-        .insert(0, "LXGWWenKai-Regular".to_owned());
+        .insert(0, "MOBO-Regular".to_owned());
 
     egui_ctx.set_fonts(fonts);
 

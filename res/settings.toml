@@ -1,8 +1,8 @@
-api = "https://deepl.deno.dev/translate"
+api = "https://deepl.loupe.page/translate"
 
 [window]
 # 字体放大，设置为负数就缩小
-font_size_plus = 3
+font_size_plus = -10
 theme = "dark" # light or dark
 
 # 窗口大小，可以设置成适合自己屏幕的大小
